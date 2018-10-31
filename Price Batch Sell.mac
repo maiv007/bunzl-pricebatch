@@ -13,12 +13,64 @@ REM This is the property of Joseph Bajcar. Any unauthorized use will result in l
 main
 
 sub main()
+	Call removeNonApplicableItems()
+	'Call updateBatchPercents()
+	
+	MsgBox("Update Complete.")
+end sub
 
+Function removeNonApplicableItems()
+
+	Dim pageend, pageline, count
+	Dim mrkCost, vndCost
+	mrkCost = ""
+	vndCost = ""
+	Do while pageend = 0
+		count = count + 1
+		autECLSession.autECLOIA.WaitForInputReady
+		autECLSession.autECLPS.SetCursorPos pageline, 002
+		autECLSession.autECLPS.Wait 10
+
+		if StrComp(autECLSession.autECLPS.GetText(pageline, 004, 1), " ") = 0 then
+			Exit do
+		end if
+
+		autECLSession.autECLPS.Wait 50
+		mrkCost = autECLSession.autECLPS.GetText(pageline, 048, 10)
+		autECLSession.autECLPS.Wait 50
+		vndCost = autECLSession.autECLPS.GetText(pageline, 021, 10)
+		autECLSession.autECLPS.Wait 50
+
+		if StrComp(Replace(mrkCost, " ", ""), "") = 0 And StrComp(Replace(vndCost, " ", ""), "") = -1 then
+			autECLSession.autECLOIA.WaitForInputReady
+			autECLSession.autECLPS.SendKeys "d"
+			autECLSession.autECLPS.Wait 10
+			autECLSession.autECLOIA.WaitForInputReady
+			autECLSession.autECLPS.SendKeys "[enter]"
+			autECLSession.autECLPS.Wait 10
+		end if
+
+
+
+		if pageline = 20 then
+			autECLSession.autECLOIA.WaitForInputReady
+			autECLSession.autECLPS.SendKeys "[roll up]"
+			autECLSession.autECLPS.Wait 10
+			pageline = 3
+		end if
+		pageline = pageline + 1
+
+	Loop
+
+
+End Function
+
+Function updateBatchPercents()
 	Dim pageend, pageline, count
 	Dim level1, level2, level3, level4, level5, level6, level7, level8, level9
 	Dim PIS604, PIS608, PIS609, PIS610, PIS001, PIS630, PIS650, PIS660, PIS670, PIS930, PIS940
 	Dim sellprice, i, marketcost
-	
+
 	PIS604 = 0.5 'price increase strategy - burlington
 	PIS608 = 0 'price increase strategy - montreal
 	PIS609 = 0 'price increase strategy - quebec city
@@ -34,9 +86,9 @@ sub main()
 	pageend = 0
 	pageline = 4
 	count = 0
-	
+
 	marketcost = ""
-	
+
 	level1 = ""
 	level2 = ""
 	level3 = ""
@@ -46,9 +98,9 @@ sub main()
 	level7 = ""
 	level8 = ""
 	level9 = ""
-	
+
 	autECLSession.autECLOIA.WaitForAppAvailable
-	
+
 	Do while pageend = 0
 		count = count + 1
 		autECLSession.autECLOIA.WaitForInputReady
@@ -72,9 +124,9 @@ sub main()
 			pageline = 3
 		end if
 		pageline = pageline + 1
-	
+
 	Loop
-	
+
 	sellprice = ""
 	count = count-1
 
@@ -300,7 +352,5 @@ sub main()
 		level8 = ""
 		level9 = ""
 	next
-	
-	
-	MsgBox("Update Complete.")
-end sub
+
+End Function
