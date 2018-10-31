@@ -13,6 +13,8 @@ REM This is the property of Joseph Bajcar. Any unauthorized use will result in l
 main
 
 sub main()
+
+
 	Call removeNonApplicableItems()
 	'Call updateBatchPercents()
 	
@@ -20,9 +22,13 @@ sub main()
 end sub
 
 Function removeNonApplicableItems()
-
 	Dim pageend, pageline, count
 	Dim mrkCost, vndCost
+
+	pageend = 0
+	pageline = 4
+	count = 0
+
 	mrkCost = ""
 	vndCost = ""
 	Do while pageend = 0
@@ -41,13 +47,14 @@ Function removeNonApplicableItems()
 		vndCost = autECLSession.autECLPS.GetText(pageline, 021, 10)
 		autECLSession.autECLPS.Wait 50
 
-		if StrComp(Replace(mrkCost, " ", ""), "") = 0 And StrComp(Replace(vndCost, " ", ""), "") = -1 then
-			autECLSession.autECLOIA.WaitForInputReady
-			autECLSession.autECLPS.SendKeys "d"
-			autECLSession.autECLPS.Wait 10
-			autECLSession.autECLOIA.WaitForInputReady
-			autECLSession.autECLPS.SendKeys "[enter]"
-			autECLSession.autECLPS.Wait 10
+		if StrComp(Replace(mrkCost, " ", ""), "") = 0 And StrComp(Replace(vndCost, " ", ""), "") = 1 then
+			MsgBox("found error item, remove")
+			'autECLSession.autECLOIA.WaitForInputReady
+			'autECLSession.autECLPS.SendKeys "d"
+			'autECLSession.autECLPS.Wait 10
+			'autECLSession.autECLOIA.WaitForInputReady
+			'autECLSession.autECLPS.SendKeys "[enter]"
+			'autECLSession.autECLPS.Wait 10
 		end if
 
 
@@ -61,8 +68,6 @@ Function removeNonApplicableItems()
 		pageline = pageline + 1
 
 	Loop
-
-
 End Function
 
 Function updateBatchPercents()
